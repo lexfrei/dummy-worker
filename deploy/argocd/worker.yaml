@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: worker
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: default
+    server: "https://kubernetes.default.svc"
+  source:
+    repoURL: "https://lexfrei.github.io/charts"
+    targetRevision: "0.1.3"
+    chart: frame
+    helm:
+      values: |
+        image:
+          repository: "ghcr.io/lexfrei/worker"
+          tag: "sha-665e6f4"
+        env:
+          REDIS_HOST: "redis-frame"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
